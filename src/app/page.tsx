@@ -1,101 +1,104 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, FormEvent } from 'react'
+import { z } from 'zod'
+import { motion } from 'framer-motion'
+import { subscribeToWaitlist } from './actions'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Icons } from "@/components/ui/icons"
+
+const schema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }).max(100, { message: "Name must not exceed 100 characters" }),
+})
+
+type FormData = z.infer<typeof schema>
+
+export default function WaitlistForm() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [response, setResponse] = useState<{ success: boolean; message: string } | null>(null)
+  const [errors, setErrors] = useState<Partial<FormData>>({})
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setErrors({})
+
+    const formData = new FormData(e.currentTarget)
+    const data = {
+      email: formData.get('email') as string,
+      name: formData.get('name') as string,
+    }
+
+    const validationResult = schema.safeParse(data)
+
+    if (!validationResult.success) {
+      const fieldErrors: Partial<FormData> = {}
+      validationResult.error.issues.forEach((issue) => {
+        if (issue.path[0] === 'email' || issue.path[0] === 'name') {
+          fieldErrors[issue.path[0]] = issue.message
+        }
+      })
+      setErrors(fieldErrors)
+      setIsLoading(false)
+      return
+    }
+
+    const result = await subscribeToWaitlist(formData)
+    setResponse(result)
+    setIsLoading(false)
+
+    if (result.success) {
+      e.currentTarget.reset()
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Join Our Waitlist</CardTitle>
+          <CardDescription className="text-center">Be the first to know when we launch!</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" name="name" placeholder="John Doe" />
+              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" type="email" placeholder="john@example.com" />
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  {/* <Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> */}
+                  Please wait
+                </>
+              ) : (
+                'Join Waitlist'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter>
+          {response && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`text-center w-full ${response.success ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {response.message}
+            </motion.div>
+          )}
+        </CardFooter>
+      </Card>
     </div>
-  );
+  )
 }
