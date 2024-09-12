@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Icons } from "@/components/ui/icons"
+import CountdownTimer from '@/components/countdown-timer'
 
 const schema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -60,6 +60,7 @@ export default function WaitlistForm() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
+          <CountdownTimer />
           <CardTitle className="text-2xl font-bold text-center">Join Our Waitlist</CardTitle>
           <CardDescription className="text-center">Be the first to know when we launch!</CardDescription>
         </CardHeader>
