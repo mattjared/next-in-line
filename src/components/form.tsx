@@ -62,7 +62,7 @@ export default function WaitlistForm() {
   return (
     <>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="pt-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input 
