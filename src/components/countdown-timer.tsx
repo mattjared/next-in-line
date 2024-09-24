@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function CountdownTimer() {
-  const targetDate = new Date('2023-12-31T23:59:59').getTime();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -14,7 +12,6 @@ export default function CountdownTimer() {
 
   useEffect(() => {
     const targetDate = new Date('2024-12-31T23:59:59').getTime()
-
     const interval = setInterval(() => {
       const now = new Date().getTime()
       const difference = targetDate - now

@@ -64,13 +64,14 @@ export default function WaitlistForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="pt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            {/* <Label htmlFor="name">Name</Label> */}
             <Input 
               id="name" 
               name="name" 
               placeholder="John Doe" 
               value={nameValue}
               onChange={(e) => setNameValue(e.target.value)}
+              className="bg-white bg-opacity-20 text-white placeholder-gray-300"
             />
             {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
           </div>
@@ -83,10 +84,14 @@ export default function WaitlistForm() {
               placeholder="john@example.com" 
               value={emailValue} 
               onChange={(e) => setEmailValue(e.target.value)}
+              className="bg-white bg-opacity-20 text-white placeholder-gray-300"
             />
             {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-4 rounded"
+            disabled={isLoading}>
             {isLoading ? (
               <>
                 {/* <Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> */}
