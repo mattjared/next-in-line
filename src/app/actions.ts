@@ -1,20 +1,20 @@
-// app/actions.ts
+// This example uses Redis from Upstash but you can use any KV store
+// See the README.md for more examples and documentation
+
 'use server'
-
-import { Redis } from '@upstash/redis'
 import { z } from 'zod'
-
-const schema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2).max(100),
-})
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!
-})
+import { Redis } from '@upstash/redis'
 
 export async function subscribeToWaitlist(formData: FormData) {
+  const redis = new Redis({
+    url: process.env.KV_API_URL!,
+    token: process.env.KV_API_TOKEN!
+  })
+
+  const schema = z.object({
+    email: z.string().email(),
+    name: z.string().min(2).max(100),
+  })
   const validatedFields = schema.safeParse({
     email: formData.get('email'),
     name: formData.get('name'),
@@ -50,3 +50,6 @@ export async function subscribeToWaitlist(formData: FormData) {
     return { success: false, message: 'An error occurred. Please try again later.' }
   }
 }
+
+// Utils
+export const checkKVAvailability = async () => !!process.env.KV_API_TOKEN;
